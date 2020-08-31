@@ -1,6 +1,5 @@
-import { SUCCESS_GRANT_PASSWORD } from '../reducers/AutorizationReducer'
-
-const BASE_URL = 'https://accounts-dev.wow.app'
+import { SUCCESS_GRANT_PASSWORD, LOGOUT } from '../reducers/AutorizationReducer'
+import { BASE_URL } from '../utils/config'
 
 export function fetchGrantPassword (username, password) {
   return (dispatch, getState) => {
@@ -21,7 +20,8 @@ export function fetchGrantPassword (username, password) {
         if (json.access_token && json.refresh_token) {
           dispatch({type: SUCCESS_GRANT_PASSWORD, payload: {
             accessBearerToken: json.access_token,
-            refreshToken: json.refresh_token
+            refreshToken: json.refresh_token,
+            auth: true
           }})
         }
         else {
@@ -34,4 +34,14 @@ export function fetchGrantPassword (username, password) {
 
 export function fetchRefreshToken (state, dispatch) {
   
+}
+
+export function logout () {
+  return (dispatch, getState) => {
+    dispatch({type: LOGOUT, payload: {
+      accessBearerToken: undefined,
+      refreshToken: undefined,
+      auth: false
+    }})
+  }
 }

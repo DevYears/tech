@@ -57,6 +57,7 @@ export default function () {
               variant="contained"
               color="primary"
               className={classes.submit}
+              disabled
             >
               Восстановить
           </Button>

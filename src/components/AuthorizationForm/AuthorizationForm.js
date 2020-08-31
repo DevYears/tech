@@ -9,18 +9,17 @@ import LoginForm from './LoginForm'
 import RegistrationForm from './RegistrationForm'
 import ForgotForm from './ForgotForm'
 
-const useStyles = makeStyles((theme) => ({}));
-
-const formList = {
-  login: {name: 'Вход в систему', component: <LoginForm/>},
-  registration: {name: 'Регистрация', component: <RegistrationForm/>}
-}
+const useStyles = makeStyles((theme) => ({
+  authFormContainer: {
+    paddingTop: theme.spacing(4)
+  }
+}));
 
 export default function () {
   const classes = useStyles();
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container className={classes.authFormContainer} component="main" maxWidth="sm">
       <Card>
         <CardContent>
           <Switch>
