@@ -1,46 +1,55 @@
-import React, { Fragment } from 'react';
-import TextField from '@material-ui/core/TextField';
+import React, { useState } from 'react';
+import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import Button from '@material-ui/core/Button';
-import { Link } from "react-router-dom";
+import { Alert, AlertTitle } from '@material-ui/lab';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import PersonIcon from '@material-ui/icons/Person';
 import MailIcon from '@material-ui/icons/Mail';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
 
-import store from '../../store'
-import { fetchGrantPassword } from '../../actions/AutorizationActions.js'
-
-const useStyles = makeStyles((theme) => ({
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  controls: {
-    marginTop: theme.spacing(3),
-  },
-}));
+import { fetchGrantPassword } from '../../actions/AutorizationActions';
+import { useAuthFormStyles } from '../../commonStyles';
+import { navigateToHandler, PAGES } from '../../routes/routes';
 
 export default function () {
-  const classes = useStyles();
+  const classes = useAuthFormStyles();
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const error = useSelector((state) => state.auth.authErrorMessage) || '';
+
+  const handleLoginChange = (e) => {
+    setLogin(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleLogin = () => {
+    dispatch(fetchGrantPassword(login, password));
+    // dispatch(fetchGrantPassword('test.technologist1@gmail.com', 'test.Technologist1'));
+  };
 
   return (
-    <Fragment>
+    <>
       <Typography className={classes.header} component="h1" variant="h5">
-        <PersonIcon/>
+        <PersonIcon />
         Вход в систему
       </Typography>
-      <form className={classes.form} noValidate>
+      <ValidatorForm
+        className={classes.form}
+        onSubmit={handleLogin}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <MailIcon/>
-            <TextField
+            <TextValidator
               autoComplete="email"
               name="email"
               variant="outlined"
@@ -49,11 +58,21 @@ export default function () {
               id="email"
               label="Введите ваш email"
               autoFocus
+              onChange={handleLoginChange}
+              value={login}
+              validators={['required', 'isEmail']}
+              errorMessages={['укажите корректный email', 'укажите корректный email']}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MailIcon />
+                  </InputAdornment>
+                ),
+              }}
             />
           </Grid>
           <Grid item xs={12}>
-            <VpnKeyIcon/>
-            <TextField
+            <TextValidator
               variant="outlined"
               required
               fullWidth
@@ -62,47 +81,63 @@ export default function () {
               type="password"
               name="password"
               autoComplete="current-password"
+              onChange={handlePasswordChange}
+              value={password}
+              validators={['required', 'minStringLength:8']}
+              errorMessages={['укажите пароль', 'укажите пароль']}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <VpnKeyIcon />
+                  </InputAdornment>
+                ),
+              }}
             />
+          </Grid>
+          <Grid item xs={12}>
+            {error !== ''
+              ? (
+                <Alert severity="error">
+                  <AlertTitle>Ошибка</AlertTitle>
+                  {error}
+                </Alert>
+              ) : null}
           </Grid>
         </Grid>
         <Grid className={classes.controls} container spacing={1}>
           <Grid item sm={4} xs={6}>
             <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                onClick={() => {
-                  store.dispatch(fetchGrantPassword('test.technologist1@gmail.com', 'test.Technologist1'))
-                }}
-              >
-                Войти
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              type="submit"
+            >
+              Войти
             </Button>
           </Grid>
           <Grid item sm={4} xs={6}>
-            <Link to="/signup">
-              <Button
-                  fullWidth
-                  variant="outlined"
-                  color="primary"
-                >
-                  Регистрация
-              </Button>
-            </Link>
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={navigateToHandler(history, PAGES.signup)}
+            >
+              Регистрация
+            </Button>
           </Grid>
           <Grid item sm={4} xs={12}>
-            <Link to="/forgot">
-              <Button
-                  fullWidth
-                  variant="outlined"
-                  color="primary"
-                >
-                  Забыли пароль?
-              </Button>
-            </Link>
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={navigateToHandler(history, PAGES.forgot)}
+            >
+              Забыли пароль?
+            </Button>
           </Grid>
         </Grid>
-      </form>
-    </Fragment>
-  )
+      </ValidatorForm>
+    </>
+  );
 }

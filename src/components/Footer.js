@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -12,12 +12,12 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: '2em',
     textAlign: 'center',
     backgroundColor: '#3f51b5',
-    color: '#fff'
-  }
+    color: '#fff',
+  },
 }));
 
 export default function () {
-  const classes = useStyles()
+  const classes = useStyles();
 
   return (
     <div className={classes.footer}>

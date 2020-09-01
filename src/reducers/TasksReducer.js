@@ -1,12 +1,12 @@
-export const SUCCESS_FETCH_TASKS = 'SUCCESS_FETCH_TASKS'
+export const SUCCESS_FETCH_TASKS = 'SUCCESS_FETCH_TASKS';
 
-const initialState = {}
+const initialState = {};
 
-export default function (state=initialState, action) {
+export default function (state = initialState, action) {
   switch (action.type) {
     case SUCCESS_FETCH_TASKS:
-      return { ...state, tasks: action.payload }
+      return { ...state, tasks: action.payload };
     default:
-      return state
+      return state;
   }
 }

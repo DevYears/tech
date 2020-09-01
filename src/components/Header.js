@@ -4,37 +4,45 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
+import { useDispatch } from 'react-redux';
 
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
-import store from '../store'
-import { logout } from '../actions/AutorizationActions'
+import { logout } from '../actions/AutorizationActions';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   title: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   logoutButton: {
-    color: '#fff'
-  }
+    color: '#fff',
+  },
 }));
 
-export default function ({auth}) {
-  const classes = useStyles()
+export default function ({ auth }) {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <AppBar position="static">
       <Toolbar>
         <Typography className={classes.title} variant="h6">
-          ЛИДОВ.РФ: ЛК технолога 
+          ЛИДОВ.РФ: ЛК технолога
         </Typography>
-        {auth ? 
-        <IconButton 
-          onClick={() => {
-            store.dispatch(logout())
-          }}
-          className={classes.logoutButton}><ExitToAppIcon/></IconButton>
-        :null}
+        {auth
+          ? (
+            <IconButton
+              onClick={handleLogout}
+              className={classes.logoutButton}
+            >
+              <ExitToAppIcon />
+            </IconButton>
+          )
+          : null}
       </Toolbar>
     </AppBar>
   );

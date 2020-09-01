@@ -1,33 +1,22 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import { Link } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 
 import PersonIcon from '@material-ui/icons/Person';
 
-const useStyles = makeStyles((theme) => ({
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  controls: {
-    marginTop: theme.spacing(3),
-  },
-}));
+import { useAuthFormStyles } from '../../commonStyles';
+import { navigateToHandler, PAGES } from '../../routes/routes';
 
 export default function () {
-  const classes = useStyles();
+  const classes = useAuthFormStyles();
+  const history = useHistory();
 
   return (
-    <Fragment>
+    <>
       <Typography className={classes.header} component="h1" variant="h5">
-        <PersonIcon/>
+        <PersonIcon />
         Регистрация
       </Typography>
       <Typography component="p">
@@ -36,28 +25,27 @@ export default function () {
       <Grid className={classes.controls} container spacing={1}>
         <Grid item xs={6}>
           <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled
-            >
-              Зарегистрироваться
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            disabled
+          >
+            Зарегистрироваться
           </Button>
         </Grid>
         <Grid item xs={6}>
-          <Link to="/login">
-            <Button
-                fullWidth
-                variant="outlined"
-                color="primary"
-              >
-                Войти
-            </Button>
-          </Link>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="primary"
+            onClick={navigateToHandler(history, PAGES.login)}
+          >
+            Войти
+          </Button>
         </Grid>
       </Grid>
-    </Fragment>
-  )
+    </>
+  );
 }
