@@ -2,9 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider, connect } from 'react-redux';
 
+import { useAppStyles } from './commonStyles';
 import Tasks from './components/Tasks/Tasks';
 import AuthorizationForm from './components/AuthorizationForm/AuthorizationForm';
 import Header from './components/Header';
+import Notification from './components/Notification';
 import Footer from './components/Footer';
 import store from './store';
 
@@ -16,10 +18,14 @@ function DecideComponent(auth) {
 }
 
 function App({ auth }) {
+  const classes = useAppStyles();
   return (
     <>
       <Header auth={auth} />
-      {DecideComponent(auth)}
+      <Notification />
+      <div className={classes.contentWrapper}>
+        {DecideComponent(auth)}
+      </div>
       <Footer />
     </>
   );

@@ -12,6 +12,7 @@ export function fetchTasks() {
     fetch(`${BASE_API_URL}/api/v1/techtasks/technologistsvc/tasks/`, {
       method: 'GET',
       headers: {
+        'Accept-Language': 'ru',
         Authorization: `Bearer ${accessBearerToken}`,
         Accept: 'application/json',
         'Content-Type': 'application/json',

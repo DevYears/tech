@@ -1,7 +1,9 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
+
 import rootReducer from '../reducers';
 import { loadState, saveState } from '../localStorage';
+import { fetchRefreshToken } from '../actions/AutorizationActions';
 
 const initialState = loadState();
 
@@ -21,6 +23,7 @@ const store = createStore(
   ),
 );
 
+// Persist auth
 store.subscribe(() => {
   const { accessBearerToken, refreshToken, auth } = store.getState().auth;
   saveState({
@@ -31,5 +34,7 @@ store.subscribe(() => {
     },
   });
 });
+
+setTimeout(() => store.dispatch(fetchRefreshToken()), 10000);
 
 export default store;

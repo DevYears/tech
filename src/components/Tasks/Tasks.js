@@ -19,14 +19,20 @@ import EditIcon from '@material-ui/icons/Edit';
 
 import store from '../../store';
 import { fetchTasks } from '../../actions/TasksActions';
+import Filters from './Filters';
 
 const useStyles = makeStyles((theme) => ({
   tasksContainer: {
     margin: theme.spacing(2),
     padding: theme.spacing(2),
+    paddingBottom: '6em',
+    height: '100%',
   },
   tasksHeader: {
     marginBottom: theme.spacing(2),
+  },
+  filters: {
+    paddingBottom: theme.spacing(2),
   },
 }));
 
@@ -80,6 +86,9 @@ export default function () {
             <UpdateIcon />
           </IconButton>
         </Grid>
+      </Grid>
+      <Grid className={classes.filters} container spacing={2}>
+        <Filters />
       </Grid>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">

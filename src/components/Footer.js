@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() => ({
   footer: {
-    position: 'absolute',
+    position: 'relative',
     bottom: 0,
     right: 0,
     left: 0,
