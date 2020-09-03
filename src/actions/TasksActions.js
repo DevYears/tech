@@ -38,6 +38,7 @@ export function fetchTasks() {
               },
             },
           });
+          dispatch(showSnackbarNotification('Данные успешно обновлены'));
         } else {
           console.error('Failed to fetch tasks', json);
           dispatch(showSnackbarNotification('Ошибка получения данных', 'error'));

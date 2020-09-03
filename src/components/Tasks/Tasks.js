@@ -13,9 +13,10 @@ import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import UpdateIcon from '@material-ui/icons/Update';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
 import EditIcon from '@material-ui/icons/Edit';
 
 import Filters from './Filters';
@@ -88,13 +89,15 @@ export default function () {
           </Typography>
         </Grid>
         <Grid>
-          <IconButton
-            onClick={() => {
-              dispatch(fetchTasks());
-            }}
-          >
-            <UpdateIcon />
-          </IconButton>
+          <Tooltip title="Обновить">
+            <IconButton
+              onClick={() => {
+                dispatch(fetchTasks());
+              }}
+            >
+              <UpdateIcon />
+            </IconButton>
+          </Tooltip>
         </Grid>
       </Grid>
       <Grid className={classes.filters} container spacing={2}>
@@ -126,8 +129,12 @@ export default function () {
                 <TableCell>{row.status_name}</TableCell>
                 <TableCell>
                   <div>
-                    <IconButton onClick={handleShowTask(row.id)}><EditIcon /></IconButton>
-                    <IconButton><DeleteForeverIcon /></IconButton>
+                    <Tooltip title="Редактировать задачу">
+                      <IconButton onClick={handleShowTask(row.id)}><EditIcon /></IconButton>
+                    </Tooltip>
+                    <Tooltip title="Сбросить задачу">
+                      <IconButton><RestoreFromTrashIcon /></IconButton>
+                    </Tooltip>
                   </div>
                 </TableCell>
               </TableRow>
