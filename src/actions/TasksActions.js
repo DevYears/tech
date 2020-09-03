@@ -38,7 +38,11 @@ export function fetchTasks() {
               },
             },
           });
-          dispatch(showSnackbarNotification('Данные успешно обновлены'));
+          if (json.result && json.result[0]) {
+            dispatch(showSnackbarNotification('Данные успешно обновлены'));
+          } else {
+            dispatch(showSnackbarNotification('По вашему запросу ничего не найдено', 'warning'));
+          }
         } else {
           console.error('Failed to fetch tasks', json);
           dispatch(showSnackbarNotification('Ошибка получения данных', 'error'));

@@ -9,7 +9,7 @@ const initialState = {
     count: 0,
   },
   filters: [],
-  limit: 0,
+  limit: 30,
   offset: 0,
   rowsPerPage: 30,
   page: 0,
