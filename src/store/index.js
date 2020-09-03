@@ -35,6 +35,6 @@ store.subscribe(() => {
   });
 });
 
-setTimeout(() => store.dispatch(fetchRefreshToken()), 10000);
+setInterval(() => store.dispatch(fetchRefreshToken()), 25000);
 
 export default store;

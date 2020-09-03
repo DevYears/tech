@@ -8,15 +8,19 @@ import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import { makeStyles } from '@material-ui/core/styles';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ControlPointIcon from '@material-ui/icons/ControlPoint';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+
+import { showSnackbarNotification } from '../../actions/NotificationActions';
+import { changeFilters as setActiveFilters } from '../../actions/TasksActions';
 
 const useFilterStyles = makeStyles(() => ({
   filterItem: {
     marginRight: '1em',
+  },
+  filterCreateDialog: {
+    minWidth: '10em',
   },
 }));
 
@@ -24,25 +28,27 @@ const FILTER_ITEMS = [
   { id: 'id', name: 'ID задачи', multiple: true },
   { id: 'doer_user_id', name: 'ID исполнителя' },
   { id: 'craftsman_user_id', name: 'ID мастера' },
-  // 1 - новая, 10 - в работе, 100 - готово
-  { id: 'status_id', name: 'ID статуса задачи', multiple: true },
+  {
+    id: 'status_id',
+    name: 'Cтатус задачи',
+    multiple: true,
+    selector: [
+      { value: 1, name: 'Новая' },
+      { value: 10, name: 'В работе' },
+      { value: 100, name: 'Готово' },
+    ],
+  },
   { id: 'type_id', name: 'ID типа задачи', multiple: true },
 ];
 
 export default function () {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [openCreateFilter, setOpenCreateFilter] = useState(false);
-  const [activeFilters, setActiveFilters] = useState([]);
+  const activeFilters = useSelector(({ tasks }) => tasks.filters);
   const [currentFilter, setCurrentFilter] = useState(undefined);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertError, setAlertError] = useState('');
   const currentFilterValueInput = useRef(null);
   const classes = useFilterStyles();
-
-  const callAlert = (error) => {
-    setAlertError(error);
-    setAlertOpen(true);
-  };
+  const dispatch = useDispatch();
 
   const handleMenuOpen = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -68,10 +74,11 @@ export default function () {
       value: currentFilterValueInput.current.value,
       name: currentFilter.id,
       description: currentFilter.name,
+      selector: currentFilter.selector,
     };
 
-    if (filter.value === '') {
-      callAlert('Заполните значение фильтра');
+    if (filter.value === '' || filter.value === undefined) {
+      dispatch(showSnackbarNotification('Заполните значение фильтра', 'warning'));
       return;
     }
 
@@ -80,25 +87,19 @@ export default function () {
       && activeFilters.filter((activeFilter) => (activeFilter.name === currentFilter.id))[0]
     ) {
       handleCloseCreateFilter();
-      callAlert('Фильтр такого типа уже присутствует');
+      dispatch(showSnackbarNotification('Фильтр такого типа уже присутствует', 'warning'));
       console.error('Filter already exists');
       return;
     }
 
-    setActiveFilters([...activeFilters, filter]);
+    dispatch(setActiveFilters([...activeFilters, filter]));
     handleCloseCreateFilter();
   };
 
-  const handleAlertClose = () => {
-    setAlertError('');
-    setAlertOpen(false);
-    // if (reason === 'clickaway') {
-    //   return;
-    // }
-  };
-
   const handleDeleteFilter = (filter) => () => {
-    setActiveFilters([...activeFilters.filter((activeFilter) => activeFilter !== filter)]);
+    dispatch(setActiveFilters([
+      ...activeFilters.filter((activeFilter) => activeFilter !== filter),
+    ]));
   };
 
   return (
@@ -118,14 +119,21 @@ export default function () {
       <Dialog open={openCreateFilter} onClose={handleCloseCreateFilter} aria-labelledby="form-dialog-title">
         <DialogContent>
           <TextField
+            className={classes.filterCreateDialog}
             inputRef={currentFilterValueInput}
+            // eslint-disable-next-line no-unneeded-ternary
+            select={currentFilter && currentFilter.selector ? true : false}
             autoFocus
             margin="dense"
             id="name"
             label="Введите значение"
             type="email"
             fullWidth
-          />
+          >
+            { currentFilter && currentFilter.selector ? currentFilter.selector.map((selector) => (
+              <MenuItem key={selector.value} value={selector.value}>{selector.name}</MenuItem>
+            )) : null}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCreateFilter} color="primary">
@@ -134,13 +142,8 @@ export default function () {
         </DialogActions>
       </Dialog>
       {activeFilters.map((activeFilter) => (
-        <Chip deleteIcon={DeleteForeverIcon} className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" />
+        <Chip key={`${activeFilter.name}: ${activeFilter.value}`} className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" />
       ))}
-      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={alertOpen} autoHideDuration={2000} onClose={handleAlertClose}>
-        <MuiAlert severity="error">
-          {alertError}
-        </MuiAlert>
-      </Snackbar>
     </>
   );
 }

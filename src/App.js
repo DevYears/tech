@@ -4,7 +4,7 @@ import { Provider, connect } from 'react-redux';
 
 import { useAppStyles } from './commonStyles';
 import Tasks from './components/Tasks/Tasks';
-import AuthorizationForm from './components/AuthorizationForm/AuthorizationForm';
+import FormContainer from './components/AuthorizationForm/FormContainer';
 import Header from './components/Header';
 import Notification from './components/Notification';
 import Footer from './components/Footer';
@@ -14,7 +14,7 @@ function DecideComponent(auth) {
   if (auth) {
     return <Tasks />;
   }
-  return <AuthorizationForm />;
+  return <FormContainer />;
 }
 
 function App({ auth }) {

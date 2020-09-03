@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,18 +8,20 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 
 import UpdateIcon from '@material-ui/icons/Update';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EditIcon from '@material-ui/icons/Edit';
 
-import store from '../../store';
-import { fetchTasks } from '../../actions/TasksActions';
 import Filters from './Filters';
+import {
+  fetchTasks, setPage, setRowsPerPage, fetchTask,
+} from '../../actions/TasksActions';
 
 const useStyles = makeStyles((theme) => ({
   tasksContainer: {
@@ -51,23 +53,31 @@ const useStyles = makeStyles((theme) => ({
 // type_name
 // status_name
 
-// function createData(name, calories, fat, carbs, protein) {
-//   return {
-//     name, calories, fat, carbs, protein,
-//   };
-// }
-
-// const rows = [
-//   createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-//   createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-//   createData('Eclair', 262, 16.0, 24, 6.0),
-//   createData('Cupcake', 305, 3.7, 67, 4.3),
-//   createData('Gingerbread', 356, 16.0, 49, 3.9),
-// ];
-
 export default function () {
-  const tasks = useSelector((state) => state.tasks.tasks) || [];
+  const {
+    tasks, paginator, page, rowsPerPage, filters,
+  } = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
   const classes = useStyles();
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch, page, rowsPerPage, filters]);
+
+  const handleShowTask = (id) => () => {
+    dispatch(fetchTask(id));
+  };
+
+  const formatDate = (dateStr) => dateStr.replace('Z', '').split('T').reverse().join(' ');
+
+  const handleChangePage = (event, newPage) => {
+    dispatch(setPage(newPage));
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    dispatch(setRowsPerPage(parseInt(event.target.value, 10)));
+    dispatch(setPage(0));
+  };
 
   return (
     <Card className={classes.tasksContainer}>
@@ -80,7 +90,7 @@ export default function () {
         <Grid>
           <IconButton
             onClick={() => {
-              store.dispatch(fetchTasks());
+              dispatch(fetchTasks());
             }}
           >
             <UpdateIcon />
@@ -109,14 +119,14 @@ export default function () {
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
-                <TableCell>{row.created_at}</TableCell>
+                <TableCell>{formatDate(row.created_at)}</TableCell>
                 <TableCell>{row.craftsman_user_id}</TableCell>
                 <TableCell>{row.doer_user_id}</TableCell>
                 <TableCell>{row.type_id}</TableCell>
                 <TableCell>{row.status_name}</TableCell>
                 <TableCell>
                   <div>
-                    <IconButton><EditIcon /></IconButton>
+                    <IconButton onClick={handleShowTask(row.id)}><EditIcon /></IconButton>
                     <IconButton><DeleteForeverIcon /></IconButton>
                   </div>
                 </TableCell>
@@ -125,6 +135,16 @@ export default function () {
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[30, 50, 100]}
+        component="div"
+        count={paginator.count}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        labelRowsPerPage="Задач на странице"
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
     </Card>
   );
 }

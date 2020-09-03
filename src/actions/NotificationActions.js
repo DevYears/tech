@@ -1,6 +1,5 @@
 import { SHOW_SNACKBAR_NOTIFICATION, HIDE_SNACKBAR_NOTIFICATION } from '../reducers/NotificationReducer';
 
-// eslint-disable-next-line import/prefer-default-export
 export function showSnackbarNotification(message = '', type = 'success', duration = 2000) {
   return (dispatch) => {
     dispatch({

@@ -1,5 +1,6 @@
 import { SUCCESS_GRANT_PASSWORD, FAIL_GRANT_PASSWORD, LOGOUT } from '../reducers/AutorizationReducer';
 import { BASE_AUTH_URL } from '../utils/config';
+import { showSnackbarNotification } from './NotificationActions';
 
 const failGrantPassword = (errorMessage) => ({
   type: FAIL_GRANT_PASSWORD,
@@ -51,13 +52,16 @@ export function fetchGrantPassword(username, password) {
         } else if (json.error && json.error.message) {
           console.error('Failed to fetch grant password', json, json.error.message);
           dispatch(failGrantPassword(json.error.message));
+          dispatch(showSnackbarNotification(json.error.message, 'error', 3000));
         } else {
           dispatch(failGrantPassword('Ошибка выполнения запроса попробуйте еще раз.'));
+          dispatch(showSnackbarNotification('Ошибка выполнения запроса попробуйте еще раз.', 'error', 3000));
         }
       })
       .catch((e) => {
         console.error('Failed to fetch grant password', e);
         dispatch(failGrantPassword('Ошибка выполнения запроса попробуйте еще раз.'));
+        dispatch(showSnackbarNotification('Ошибка выполнения запроса попробуйте еще раз.', 'error', 3000));
       });
   };
 }
@@ -96,6 +100,7 @@ export function fetchRefreshToken() {
         } else if (json.error && json.error.message) {
           console.error('Failed to fetch refresh token', json, json.error.message);
           dispatch(logout());
+          dispatch(showSnackbarNotification('Ошибка обновления токена, повторите авторизацию', 'error', 3000));
         } else {
           dispatch(logout());
         }
@@ -103,6 +108,7 @@ export function fetchRefreshToken() {
       .catch((e) => {
         console.error('Failed to fetch refresh token', e);
         dispatch(logout());
+        dispatch(showSnackbarNotification('Ошибка обновления токена, повторите авторизацию', 'error', 3000));
       });
   };
 }
