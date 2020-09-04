@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Grid } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -15,12 +16,15 @@ import ControlPointIcon from '@material-ui/icons/ControlPoint';
 import { showSnackbarNotification } from '../../actions/NotificationActions';
 import { changeFilters as setActiveFilters } from '../../actions/TasksActions';
 
-const useFilterStyles = makeStyles(() => ({
+const useFilterStyles = makeStyles((theme) => ({
   filterItem: {
     marginRight: '1em',
   },
   filterCreateDialog: {
     minWidth: '10em',
+  },
+  filterContainer: {
+    paddingBottom: theme.spacing(2),
   },
 }));
 
@@ -88,7 +92,6 @@ export default function () {
     ) {
       handleCloseCreateFilter();
       dispatch(showSnackbarNotification('Фильтр такого типа уже присутствует', 'warning'));
-      console.error('Filter already exists');
       return;
     }
 
@@ -103,8 +106,13 @@ export default function () {
   };
 
   return (
-    <>
-      <Chip className={classes.filterItem} label="Добавить фильтр" color="primary" onClick={handleMenuOpen} icon={<ControlPointIcon />} />
+    <Grid className={classes.filterContainer} container spacing={2}>
+      <Grid item>
+        <Chip className={classes.filterItem} label="Добавить фильтр" color="primary" onClick={handleMenuOpen} icon={<ControlPointIcon />} />
+      </Grid>
+      {activeFilters.map((activeFilter) => (
+        <Grid item><Chip key={`${activeFilter.name}: ${activeFilter.value}`} className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" /></Grid>
+      ))}
       <Menu
         id="simple-menu"
         anchorEl={menuAnchor}
@@ -141,9 +149,6 @@ export default function () {
           </Button>
         </DialogActions>
       </Dialog>
-      {activeFilters.map((activeFilter) => (
-        <Chip key={`${activeFilter.name}: ${activeFilter.value}`} className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" />
-      ))}
-    </>
+    </Grid>
   );
 }

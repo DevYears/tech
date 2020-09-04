@@ -14,14 +14,17 @@ import IconButton from '@material-ui/core/IconButton';
 import { useSelector, useDispatch } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
+import { useHistory } from 'react-router-dom';
 
 import UpdateIcon from '@material-ui/icons/Update';
 import RestoreFromTrashIcon from '@material-ui/icons/RestoreFromTrash';
 import EditIcon from '@material-ui/icons/Edit';
+import QueueIcon from '@material-ui/icons/Queue';
 
 import Filters from './Filters';
+import { navigateToHandler } from '../../routes/routes';
 import {
-  fetchTasks, setPage, setRowsPerPage, fetchTask,
+  fetchTasks, setPage, setRowsPerPage, fetchTakeNew, fetchTaskReset,
 } from '../../actions/TasksActions';
 
 const useStyles = makeStyles((theme) => ({
@@ -29,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
     padding: theme.spacing(2),
     paddingBottom: '6em',
-    height: '100%',
   },
   tasksHeader: {
     marginBottom: theme.spacing(2),
@@ -39,35 +41,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// id
-// author_user_id
-// craftsman_user_id
-// doer_user_id
-// type_id
-// status_id
-// version
-// descr
-// created_at
-// started_at
-// completed_at
-// descr_parsed
-// type_name
-// status_name
-
 export default function () {
   const {
     tasks, paginator, page, rowsPerPage, filters,
   } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
   const classes = useStyles();
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch, page, rowsPerPage, filters]);
-
-  const handleShowTask = (id) => () => {
-    dispatch(fetchTask(id));
-  };
 
   const formatDate = (dateStr) => dateStr.replace('Z', '').split('T').reverse().join(' ');
 
@@ -80,6 +64,11 @@ export default function () {
     dispatch(setPage(0));
   };
 
+  const handleResetTask = (id) => () => {
+    dispatch(fetchTaskReset(id));
+    setTimeout(() => dispatch(fetchTasks()), 1000);
+  };
+
   return (
     <Card className={classes.tasksContainer}>
       <Grid container justify="space-between">
@@ -89,6 +78,15 @@ export default function () {
           </Typography>
         </Grid>
         <Grid>
+          <Tooltip title="Взять в работу новую задачу">
+            <IconButton
+              onClick={() => {
+                dispatch(fetchTakeNew());
+              }}
+            >
+              <QueueIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Обновить">
             <IconButton
               onClick={() => {
@@ -100,9 +98,7 @@ export default function () {
           </Tooltip>
         </Grid>
       </Grid>
-      <Grid className={classes.filters} container spacing={2}>
-        <Filters />
-      </Grid>
+      <Filters />
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
@@ -129,11 +125,13 @@ export default function () {
                 <TableCell>{row.status_name}</TableCell>
                 <TableCell>
                   <div>
-                    <Tooltip title="Редактировать задачу">
-                      <IconButton onClick={handleShowTask(row.id)}><EditIcon /></IconButton>
+                    <Tooltip title="Открыть задачу">
+                      <IconButton onClick={navigateToHandler(history, `/tasks/${row.id}`)}><EditIcon /></IconButton>
                     </Tooltip>
                     <Tooltip title="Сбросить задачу">
-                      <IconButton><RestoreFromTrashIcon /></IconButton>
+                      <IconButton onClick={handleResetTask(row.id)}>
+                        <RestoreFromTrashIcon />
+                      </IconButton>
                     </Tooltip>
                   </div>
                 </TableCell>

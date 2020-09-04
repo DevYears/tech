@@ -3,7 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider, connect } from 'react-redux';
 
 import { useAppStyles } from './commonStyles';
-import Tasks from './components/Tasks/Tasks';
+import TasksRouter from './routes/TasksRouter';
 import FormContainer from './components/AuthorizationForm/FormContainer';
 import Header from './components/Header';
 import Notification from './components/Notification';
@@ -12,7 +12,7 @@ import store from './store';
 
 function DecideComponent(auth) {
   if (auth) {
-    return <Tasks />;
+    return <TasksRouter />;
   }
   return <FormContainer />;
 }
