@@ -111,7 +111,7 @@ export default function () {
         <Chip className={classes.filterItem} label="Добавить фильтр" color="primary" onClick={handleMenuOpen} icon={<ControlPointIcon />} />
       </Grid>
       {activeFilters.map((activeFilter) => (
-        <Grid item><Chip key={`${activeFilter.name}: ${activeFilter.value}`} className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" /></Grid>
+        <Grid key={`${activeFilter.description}: ${activeFilter.value}`} item><Chip className={classes.filterItem} label={`${activeFilter.description}: ${activeFilter.value}`} onDelete={handleDeleteFilter(activeFilter)} color="primary" variant="outlined" /></Grid>
       ))}
       <Menu
         id="simple-menu"
@@ -135,7 +135,6 @@ export default function () {
             margin="dense"
             id="name"
             label="Введите значение"
-            type="email"
             fullWidth
           >
             { currentFilter && currentFilter.selector ? currentFilter.selector.map((selector) => (

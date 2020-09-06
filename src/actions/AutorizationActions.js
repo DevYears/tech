@@ -1,6 +1,7 @@
 import { SUCCESS_GRANT_PASSWORD, FAIL_GRANT_PASSWORD, LOGOUT } from '../reducers/AutorizationReducer';
 import { BASE_AUTH_URL } from '../utils/config';
 import { showSnackbarNotification } from './NotificationActions';
+import { saveState } from '../localStorage';
 
 const failGrantPassword = (errorMessage) => ({
   type: FAIL_GRANT_PASSWORD,
@@ -11,6 +12,13 @@ const failGrantPassword = (errorMessage) => ({
 
 export function logout() {
   return (dispatch) => {
+    saveState({
+      auth: {
+        accessBearerToken: undefined,
+        refreshToken: undefined,
+        auth: false,
+      },
+    });
     dispatch({
       type: LOGOUT,
       payload: {
@@ -40,6 +48,13 @@ export function fetchGrantPassword(username, password) {
       .then((response) => response.json())
       .then((json) => {
         if (json.access_token && json.refresh_token) {
+          saveState({
+            auth: {
+              accessBearerToken: json.access_token,
+              refreshToken: json.refresh_token,
+              auth: true,
+            },
+          });
           dispatch({
             type: SUCCESS_GRANT_PASSWORD,
             payload: {
@@ -88,6 +103,13 @@ export function fetchRefreshToken() {
       .then((response) => response.json())
       .then((json) => {
         if (json.access_token && json.refresh_token) {
+          saveState({
+            auth: {
+              accessBearerToken: json.access_token,
+              refreshToken: json.refresh_token,
+              auth: true,
+            },
+          });
           dispatch({
             type: SUCCESS_GRANT_PASSWORD,
             payload: {

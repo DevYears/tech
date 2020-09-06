@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
   tasksHeader: {
     marginBottom: theme.spacing(2),
   },
+  tasksRow: {
+    cursor: 'pointer',
+  },
   filters: {
     paddingBottom: theme.spacing(2),
   },
@@ -53,7 +56,12 @@ export default function () {
     dispatch(fetchTasks());
   }, [dispatch, page, rowsPerPage, filters]);
 
-  const formatDate = (dateStr) => dateStr.replace('Z', '').split('T').reverse().join(' ');
+  // Fast DateTime conversion
+  const formatDate = (dateStr) => dateStr.replace('Z', '').split('T').reverse().join(' ')
+    .split('-')
+    .reverse()
+    .map((val, index) => (index !== 2 ? val : val.split(' ').reverse().join(' ')))
+    .join('.');
 
   const handleChangePage = (event, newPage) => {
     dispatch(setPage(newPage));
@@ -67,6 +75,17 @@ export default function () {
   const handleResetTask = (id) => () => {
     dispatch(fetchTaskReset(id));
     setTimeout(() => dispatch(fetchTasks()), 1000);
+  };
+
+  const handleShowTask = (id) => () => {
+    navigateToHandler(history, `/tasks/${id}`)();
+  };
+
+  const replaceDoer = (id) => {
+    if (id === 0) {
+      return 'Нет';
+    }
+    return id;
   };
 
   return (
@@ -114,19 +133,23 @@ export default function () {
           </TableHead>
           <TableBody>
             {tasks.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                className={classes.tasksRow}
+                key={row.id}
+                onDoubleClick={handleShowTask(row.id)}
+              >
                 <TableCell component="th" scope="row">
                   {row.id}
                 </TableCell>
                 <TableCell>{formatDate(row.created_at)}</TableCell>
                 <TableCell>{row.craftsman_user_id}</TableCell>
-                <TableCell>{row.doer_user_id}</TableCell>
-                <TableCell>{row.type_id}</TableCell>
+                <TableCell>{replaceDoer(row.doer_user_id)}</TableCell>
+                <TableCell>{row.type_name}</TableCell>
                 <TableCell>{row.status_name}</TableCell>
                 <TableCell>
                   <div>
                     <Tooltip title="Открыть задачу">
-                      <IconButton onClick={navigateToHandler(history, `/tasks/${row.id}`)}><EditIcon /></IconButton>
+                      <IconButton onClick={handleShowTask(row.id)}><EditIcon /></IconButton>
                     </Tooltip>
                     <Tooltip title="Сбросить задачу">
                       <IconButton onClick={handleResetTask(row.id)}>
