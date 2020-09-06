@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Grid } from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
 import Menu from '@material-ui/core/Menu';
@@ -10,18 +10,20 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch, useSelector } from 'react-redux';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import ControlPointIcon from '@material-ui/icons/ControlPoint';
 
 import { showSnackbarNotification } from '../../actions/NotificationActions';
 import { changeFilters as setActiveFilters, setPage } from '../../actions/TasksActions';
+import { fetchUserByTerm } from '../../actions/DirectoryActions';
 
 const useFilterStyles = makeStyles((theme) => ({
   filterItem: {
     marginRight: '1em',
   },
   filterCreateDialog: {
-    minWidth: '10em',
+    minWidth: '23em',
   },
   filterContainer: {
     paddingBottom: theme.spacing(2),
@@ -30,8 +32,8 @@ const useFilterStyles = makeStyles((theme) => ({
 
 const FILTER_ITEMS = [
   { id: 'id', name: 'ID задачи', multiple: true },
-  { id: 'doer_user_id', name: 'ID исполнителя', selectUser: true },
-  { id: 'craftsman_user_id', name: 'ID мастера', selectUser: true },
+  { id: 'doer_user_id', name: 'Исполнитель', selectUser: true },
+  { id: 'craftsman_user_id', name: 'Мастер', selectUser: true },
   {
     id: 'status_id',
     name: 'Cтатус задачи',
@@ -45,12 +47,77 @@ const FILTER_ITEMS = [
   { id: 'type_id', name: 'ID типа задачи', multiple: true },
 ];
 
+const FilterInput = ({
+  handleFilterInputChange, currentFilter, currentFilterValue, currentFilterOptions,
+}) => {
+  const classes = useFilterStyles();
+  if (!currentFilter) {
+    return null;
+  }
+
+  if (currentFilter.selector) {
+    return (
+      <TextField
+        className={classes.filterCreateDialog}
+        // eslint-disable-next-line no-unneeded-ternary
+        select
+        onChange={handleFilterInputChange}
+        autoFocus
+        margin="dense"
+        id="name"
+        label={currentFilter.name}
+        fullWidth
+        value={currentFilterValue}
+      >
+        { currentFilter && currentFilter.selector ? currentFilter.selector.map((selector) => (
+          <MenuItem key={selector.value} value={selector.value}>{selector.name}</MenuItem>
+        )) : null}
+      </TextField>
+    );
+  }
+
+  if (currentFilter.selectUser) {
+    return (
+      <Autocomplete
+        className={classes.filterCreateDialog}
+        options={currentFilterOptions}
+        value={currentFilterValue}
+        getOptionLabel={(option) => `${option.last_name} ${option.name} (${option.email})`}
+        onChange={handleFilterInputChange}
+        renderInput={(params) => (
+          <TextField
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...params}
+            onChange={handleFilterInputChange}
+            label={currentFilter.name}
+          />
+        )}
+      />
+    );
+  }
+
+  return (
+    <TextField
+      className={classes.filterCreateDialog}
+      // eslint-disable-next-line no-unneeded-ternary
+      onChange={handleFilterInputChange}
+      autoFocus
+      margin="dense"
+      id="name"
+      label={currentFilter.name}
+      fullWidth
+      value={currentFilterValue}
+    />
+  );
+};
+
 export default function () {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [openCreateFilter, setOpenCreateFilter] = useState(false);
   const activeFilters = useSelector(({ tasks }) => tasks.filters);
+  const usersByTerm = useSelector(({ directory }) => directory.usersByTerm);
   const [currentFilter, setCurrentFilter] = useState(undefined);
-  const currentFilterValueInput = useRef(null);
+  const [currentFilterValue, setCurrentFilterValue] = useState(undefined);
   const classes = useFilterStyles();
   const dispatch = useDispatch();
 
@@ -70,12 +137,13 @@ export default function () {
 
   const handleCloseCreateFilter = () => {
     setCurrentFilter(undefined);
+    setCurrentFilterValue(undefined);
     setOpenCreateFilter(false);
   };
 
   const handleCreateFilter = () => {
     const filter = {
-      value: currentFilterValueInput.current.value,
+      value: currentFilterValue,
       name: currentFilter.id,
       description: currentFilter.name,
       selector: currentFilter.selector,
@@ -107,6 +175,21 @@ export default function () {
     ]));
   };
 
+  const handleFilterInputChange = (e, newVal) => {
+    const val = e.target.value;
+
+    if (currentFilter.selectUser && val.length > 2) {
+      dispatch(fetchUserByTerm(val));
+    }
+
+    if (newVal && newVal.id) {
+      setCurrentFilterValue(newVal.id);
+      return;
+    }
+
+    setCurrentFilterValue(val);
+  };
+
   return (
     <Grid className={classes.filterContainer} container spacing={2}>
       <Grid item>
@@ -128,21 +211,12 @@ export default function () {
       </Menu>
       <Dialog open={openCreateFilter} onClose={handleCloseCreateFilter} aria-labelledby="form-dialog-title">
         <DialogContent>
-          <TextField
-            className={classes.filterCreateDialog}
-            inputRef={currentFilterValueInput}
-            // eslint-disable-next-line no-unneeded-ternary
-            select={currentFilter && currentFilter.selector ? true : false}
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Введите значение"
-            fullWidth
-          >
-            { currentFilter && currentFilter.selector ? currentFilter.selector.map((selector) => (
-              <MenuItem key={selector.value} value={selector.value}>{selector.name}</MenuItem>
-            )) : null}
-          </TextField>
+          <FilterInput
+            handleFilterInputChange={handleFilterInputChange}
+            currentFilter={currentFilter}
+            currentFilterValue={currentFilterValue}
+            currentFilterOptions={usersByTerm}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCreateFilter} color="primary">
