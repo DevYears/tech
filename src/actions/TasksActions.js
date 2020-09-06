@@ -38,6 +38,8 @@ export function fetchTasks() {
             type: SUCCESS_FETCH_TASKS,
             payload: {
               tasks: json.result,
+              offset: 0,
+              page: 0,
               paginator: {
                 offset: json.paginator.offset,
                 limit: json.paginator.limit,

@@ -30,8 +30,8 @@ const useFilterStyles = makeStyles((theme) => ({
 
 const FILTER_ITEMS = [
   { id: 'id', name: 'ID задачи', multiple: true },
-  { id: 'doer_user_id', name: 'ID исполнителя' },
-  { id: 'craftsman_user_id', name: 'ID мастера' },
+  { id: 'doer_user_id', name: 'ID исполнителя', selectUser: true },
+  { id: 'craftsman_user_id', name: 'ID мастера', selectUser: true },
   {
     id: 'status_id',
     name: 'Cтатус задачи',
