@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import marked from 'marked';
 
 import { fetchTask, changeTask, fetchTaskReady } from '../../actions/TasksActions';
+import { fetchUsers } from '../../actions/DirectoryActions';
 import { navigateToHandler, PAGES } from '../../routes/routes';
 
 const useStyles = makeStyles((theme) => ({
@@ -27,10 +28,17 @@ export default function () {
   const { id } = useParams();
   const dispatch = useDispatch();
   const task = useSelector((({ tasks }) => tasks.task));
+  const users = useSelector(({ directory }) => directory.users);
 
   useEffect(() => {
     dispatch(fetchTask(id));
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (task) {
+      dispatch(fetchUsers([task.craftsman_user_id, task.Buttondoer_user_id]));
+    }
+  }, [task, dispatch]);
 
   const markdownToHtml = (md) => marked(md);
   // @todo Potential XSS, let's pretend we trust the server
@@ -43,6 +51,19 @@ export default function () {
   const closeHandler = () => {
     dispatch(changeTask(undefined));
     navigateToHandler(history, PAGES.tasks)();
+  };
+
+  const replaceUser = (userId) => {
+    if (userId === 0) {
+      return 'Нет';
+    }
+    if (users) {
+      const userData = users[userId];
+      if (userData) {
+        return `${userData.last_name} ${userData.name}`;
+      }
+    }
+    return userId;
   };
 
   if (!task) {
@@ -72,10 +93,10 @@ export default function () {
         {`${task.created_at}, ${task.status_name}`}
       </Typography>
       <Typography component="p">
-        {`ID Мастера: ${task.craftsman_user_id}`}
+        {`Мастер: ${replaceUser(task.craftsman_user_id)}`}
       </Typography>
       <Typography component="p">
-        {`ID Исполнителя: ${task.doer_user_id}`}
+        {`Исполнитель: ${replaceUser(task.doer_user_id)}`}
       </Typography>
       <Typography component="h1" variant="h6">
         Описание:
