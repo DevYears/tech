@@ -41,6 +41,9 @@ const useStyles = makeStyles((theme) => ({
   },
   tasksRow: {
     cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#eee',
+    },
   },
   filters: {
     paddingBottom: theme.spacing(2),

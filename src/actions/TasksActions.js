@@ -140,7 +140,7 @@ export function fetchTaskReady(task_id, version) {
       .then((response) => response.json())
       .then((json) => {
         if (json && json.status === 'OK') {
-          dispatch(showSnackbarNotification('Вы успешно перевили задачу в статус готова', 'success'));
+          dispatch(showSnackbarNotification('Вы успешно перевели задачу в статус готова', 'success'));
         } else if (json && json.error && json.error.code === 806 && json.error.message) {
           dispatch(showSnackbarNotification(json.error.message, 'error', 4000));
         } else {
@@ -175,7 +175,7 @@ export function fetchTaskReset(task_id) {
       .then((response) => response.json())
       .then((json) => {
         if (json && json.status === 'OK') {
-          dispatch(showSnackbarNotification('Вы успешно перевили задачу в статус новая', 'success'));
+          dispatch(showSnackbarNotification('Вы успешно перевели задачу в статус новая', 'success'));
         } else if (json && json.error && json.error.message) {
           dispatch(showSnackbarNotification(json.error.message, 'error', 4000));
         } else {

@@ -58,7 +58,7 @@ export function fetchUserByTerm(term) {
           dispatch({
             type: SUCCESS_FETCH_USER_BY_TERM,
             payload: {
-              users: json.items,
+              usersByTerm: json.items,
             },
           });
         }

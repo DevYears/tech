@@ -3,6 +3,7 @@ export const SUCCESS_FETCH_USER_BY_TERM = 'SUCCESS_FETCH_USER_BY_TERM';
 
 const initialState = {
   users: [],
+  usersByTerm: [],
 };
 
 export default function (state = initialState, action) {
