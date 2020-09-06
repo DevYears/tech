@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ControlPointIcon from '@material-ui/icons/ControlPoint';
 
 import { showSnackbarNotification } from '../../actions/NotificationActions';
-import { changeFilters as setActiveFilters } from '../../actions/TasksActions';
+import { changeFilters as setActiveFilters, setPage } from '../../actions/TasksActions';
 
 const useFilterStyles = makeStyles((theme) => ({
   filterItem: {
@@ -95,11 +95,13 @@ export default function () {
       return;
     }
 
+    dispatch(setPage(0));
     dispatch(setActiveFilters([...activeFilters, filter]));
     handleCloseCreateFilter();
   };
 
   const handleDeleteFilter = (filter) => () => {
+    dispatch(setPage(0));
     dispatch(setActiveFilters([
       ...activeFilters.filter((activeFilter) => activeFilter !== filter),
     ]));

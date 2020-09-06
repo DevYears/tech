@@ -34,7 +34,6 @@ export default function () {
 
   const handleLogin = () => {
     dispatch(fetchGrantPassword(login, password));
-    // dispatch(fetchGrantPassword('test.technologist1@gmail.com', 'test.Technologist1'));
   };
 
   return (

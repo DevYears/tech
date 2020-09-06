@@ -87,7 +87,6 @@ export function fetchRefreshToken() {
     if (!refreshToken) {
       return;
     }
-    console.log('FETCHING REFRESH TOKEN');
     fetch(`${BASE_AUTH_URL}/api/v1/jwt/grant`, {
       method: 'POST',
       headers: {

@@ -38,8 +38,6 @@ export function fetchTasks() {
             type: SUCCESS_FETCH_TASKS,
             payload: {
               tasks: json.result,
-              offset: 0,
-              page: 0,
               paginator: {
                 offset: json.paginator.offset,
                 limit: json.paginator.limit,
@@ -203,12 +201,13 @@ export const setRowsPerPage = (value) => ({
 });
 
 export const setPage = (value) => (dispatch, getState) => {
+  const state = getState();
   dispatch({
     type: SET_PAGE,
     payload: {
       page: value,
-      offset: value * getState().tasks.rowsPerPage,
-      limit: getState().tasks.rowsPerPage,
+      offset: value * state.tasks.rowsPerPage,
+      limit: state.tasks.rowsPerPage,
     },
   });
 };
