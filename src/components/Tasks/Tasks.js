@@ -26,6 +26,9 @@ import { navigateToHandler } from '../../routes/routes';
 import {
   fetchTasks, setPage, setRowsPerPage, fetchTakeNew, fetchTaskReset,
 } from '../../actions/TasksActions';
+import {
+  fetchUsers,
+} from '../../actions/DirectoryActions';
 
 const useStyles = makeStyles((theme) => ({
   tasksContainer: {
@@ -48,6 +51,7 @@ export default function () {
   const {
     tasks, paginator, page, rowsPerPage, filters,
   } = useSelector((state) => state.tasks);
+  const users = useSelector(({ directory }) => directory.users);
   const dispatch = useDispatch();
   const classes = useStyles();
   const history = useHistory();
@@ -55,6 +59,14 @@ export default function () {
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch, page, rowsPerPage, filters]);
+
+  useEffect(() => {
+    const userIds = new Set([
+      ...tasks.map((task) => task.craftsman_user_id),
+      ...tasks.map((task) => task.doer_user_id),
+    ]);
+    dispatch(fetchUsers([...userIds]));
+  }, [dispatch, tasks]);
 
   // Fast DateTime conversion
   const formatDate = (dateStr) => dateStr.replace('Z', '').split('T').reverse().join(' ')
@@ -81,9 +93,15 @@ export default function () {
     navigateToHandler(history, `/tasks/${id}`)();
   };
 
-  const replaceDoer = (id) => {
+  const replaceUser = (id) => {
     if (id === 0) {
       return 'Нет';
+    }
+    if (users) {
+      const userData = users[id];
+      if (userData) {
+        return `${userData.last_name} ${userData.name}`;
+      }
     }
     return id;
   };
@@ -142,8 +160,8 @@ export default function () {
                   {row.id}
                 </TableCell>
                 <TableCell>{formatDate(row.created_at)}</TableCell>
-                <TableCell>{row.craftsman_user_id}</TableCell>
-                <TableCell>{replaceDoer(row.doer_user_id)}</TableCell>
+                <TableCell>{replaceUser(row.craftsman_user_id)}</TableCell>
+                <TableCell>{replaceUser(row.doer_user_id)}</TableCell>
                 <TableCell>{row.type_name}</TableCell>
                 <TableCell>{row.status_name}</TableCell>
                 <TableCell>
